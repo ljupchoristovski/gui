@@ -1,35 +1,49 @@
 import React from 'react';
 import './App.css';
 import * as go from 'gojs';
-import { ReactDiagram } from 'gojs-react';
+import { ReactDiagram, ReactPalette } from 'gojs-react';
 
-function initDiagram() {
+function initDiagram(diagramId) {
   const $ = go.GraphObject.make;
-  const diagram =
-    $(go.Diagram,
-      {
-        'undoManager.isEnabled': true, 
-        'clickCreatingTool.archetypeNodeData': { text: 'new node', color: 'lightblue' },
-        model: $(go.GraphLinksModel,
-          {
-            linkKeyProperty: 'key'  
-          })
-      });
 
-  diagram.nodeTemplate =
-    $(go.Node, 'Auto',  
-      new go.Binding('location', 'loc', go.Point.parse).makeTwoWay(go.Point.stringify),
-      $(go.Shape, 'RoundedRectangle',
-        { name: 'SHAPE', fill: 'white', strokeWidth: 0 },
-        new go.Binding('fill', 'color')),
-      $(go.TextBlock,
-        { margin: 8, editable: true },  
-        new go.Binding('text').makeTwoWay()
-      )
+    const myDiagram = $(go.Diagram, "root", {
+        initialContentAlignment: go.Spot.LeftCenter
+    });
+
+    myDiagram.nodeTemplate = $(
+        go.Node,
+        'Auto',
+        $(go.Shape, 'RoundedRectangle', { strokeWidth: 0 }, new go.Binding('fill', 'color')),
+        $(go.TextBlock, { margin: 8 }, new go.Binding('text', 'key'))
     );
 
-  return diagram;
+    return myDiagram;
 }
+
+function initPalette() {
+  const $ = go.GraphObject.make;
+  const palette =
+  $(go.Palette, "palette-content",
+	{
+		layout: $(go.GridLayout,
+		{
+			cellSize: new go.Size(200, 20),
+			wrappingColumn: 1
+		})      
+	});
+  palette.nodeTemplate = $(go.Node, "Horizontal", 
+  {    
+       movable: false
+  },
+    $(go.Shape,
+      { width: 15, height: 15, fill: "white" },
+      new go.Binding("fill", "color")),
+    $(go.TextBlock,
+      new go.Binding("text", "color"))
+  );
+  return palette;
+}
+
 
 function handleModelChange(changes) {
   console.log(changes);
@@ -38,8 +52,8 @@ function handleModelChange(changes) {
 function App() {
   return (
     <div>
-      ...
-      <ReactDiagram
+      <ReactDiagram 
+        diagramId="myDiagramDiv"
         initDiagram={initDiagram}
         divClassName='diagram-component'
         nodeDataArray={[
@@ -57,7 +71,19 @@ function App() {
         ]}
         onModelChange={(e) => handleModelChange(e)}
       />
-      ...
+    {/* <div id="palette-content" style={{'width': '500px', 'height': '500px', 'backgroundColor': '#DAE4E4'}}>
+      <ReactPalette
+        initPalette={initPalette}
+        divClassName='palette-component'
+        nodeDataArray={[
+          { key: "LB", color: "lightblue" },
+          { key: "P", color: "pink" },
+          { key: "Y", color: "yellow" },
+          { key: "LG", color: "lightgreen" },
+          { key: "O", color: "orange" }
+        ]}
+      />
+      </div> */}
     </div>
   );
 }
