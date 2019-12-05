@@ -1,24 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 import * as go from "gojs";
 import { ReactDiagram, ReactPalette } from "gojs-react";
 import { connect } from "react-redux";
-import {
-  insertDiagramNode,
-  removeDiagramNode,
-  selectNodeDiagram,
-  getArticles,
-  updateNode
-} from "./redux/actions/index";
-import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import TextField from "@material-ui/core/TextField";
+import "./App.css";
 
-import "./App.css"; // contains .diagram-component CSS
-
-// render function...
 function ConnectApp() {
   const [selectedNode, setSelectedNode] = useState({});
   const [paramText, setParamText] = useState();
@@ -27,7 +17,7 @@ function ConnectApp() {
   const paletteNodes = [
     {
       key: 1,
-      text: "Alpha",
+      text: "Operator 1",
       color: "red",
       loc: "0 0",
       type: "1",
@@ -38,21 +28,10 @@ function ConnectApp() {
     },
     {
       key: 2,
-      text: "Beta",
+      text: "Operator 2",
       color: "green",
       loc: "150 0",
       type: "2",
-      leftArray: [],
-      topArray: [],
-      bottomArray: [],
-      rightArray: []
-    },
-    {
-      key: 3,
-      text: "Gamma",
-      color: "blue",
-      loc: "0 150",
-      type: "3",
       leftArray: [],
       topArray: [],
       bottomArray: [],
@@ -67,7 +46,6 @@ function ConnectApp() {
       "ContextMenuButton",
       $(go.TextBlock, text),
       { click: action },
-      // don't bother with binding GraphObject.visible if there's no predicate
       visiblePredicate
         ? new go.Binding("visible", "", function(o, e) {
             return o.diagram ? visiblePredicate(o, e) : false;
@@ -97,17 +75,12 @@ function ConnectApp() {
 
   function initPalette() {
     const palette = $(go.Palette, {
-      "undoManager.isEnabled": true, // enable undo & redo
-      "clickCreatingTool.archetypeNodeData": {
-        text: "new node"
-        // color: "lightblue"
-      },
+      "undoManager.isEnabled": true,
       model: $(go.GraphLinksModel, {
-        linkKeyProperty: "key" // IMPORTANT! must be defined for merges and data sync when using GraphLinksModel
+        linkKeyProperty: "key"
       })
     });
 
-    // define a simple Node template
     palette.nodeTemplate = $(
       go.Node,
       "Horizontal",
@@ -125,19 +98,16 @@ function ConnectApp() {
         new go.Binding("text", "text")
       )
     );
-
     return palette;
   }
 
   const diagram = $(go.Diagram, {
-    "undoManager.isEnabled": true, // enable undo & redo
+    "undoManager.isEnabled": true,
     model: $(go.GraphLinksModel, {
-      linkKeyProperty: "key", // IMPORTANT! must be defined for merges and data sync when using GraphLinksModel
-      nodeKeyProperty: "key"
+      linkKeyProperty: "key"
     })
   });
 
-  // define a simple Node template
   diagram.nodeTemplate = $(
     go.Node,
     "Table",
@@ -147,11 +117,9 @@ function ConnectApp() {
       selectionObjectName: "BODY",
       contextMenu: nodeMenu
     },
-    // new go.Binding("location", "loc", go.Point.parse).makeTwoWay(
-    //   go.Point.stringify
-    // ),
-
-    // the body
+    new go.Binding("location", "loc", go.Point.parse).makeTwoWay(
+      go.Point.stringify
+    ),
     $(
       go.Panel,
       "Auto",
@@ -161,12 +129,17 @@ function ConnectApp() {
         name: "BODY",
         stretch: go.GraphObject.Fill
       },
-      $(go.Shape, "Rectangle", {
-        fill: "#dbf6cb",
-        stroke: null,
-        strokeWidth: 0,
-        minSize: new go.Size(60, 60)
-      }),
+      $(
+        go.Shape,
+        "Rectangle",
+        {
+          fill: "#dbf6cb",
+          stroke: null,
+          strokeWidth: 0,
+          minSize: new go.Size(150, 120)
+        },
+        new go.Binding("fill", "color")
+      ),
       $(
         go.TextBlock,
         {
@@ -178,17 +151,14 @@ function ConnectApp() {
         },
         new go.Binding("text", "text").makeTwoWay()
       )
-    ), // end Auto Panel body
-
-    // the Panel holding the left port elements, which are themselves Panels,
-    // created for each item in the itemArray, bound to data.leftArray
+    ),
     $(go.Panel, "Vertical", new go.Binding("itemArray", "leftArray"), {
       row: 1,
       column: 0,
       itemTemplate: $(
         go.Panel,
         {
-          _side: "left", // internal property to make it easier to tell which side it's on
+          _side: "left",
           fromSpot: go.Spot.Left,
           toSpot: go.Spot.Left,
           fromLinkable: true,
@@ -207,11 +177,8 @@ function ConnectApp() {
           },
           new go.Binding("fill", "portColor")
         )
-      ) // end itemTemplate
-    }), // end Vertical Panel
-
-    // the Panel holding the top port elements, which are themselves Panels,
-    // created for each item in the itemArray, bound to data.topArray
+      )
+    }),
     $(go.Panel, "Horizontal", new go.Binding("itemArray", "topArray"), {
       row: 0,
       column: 1,
@@ -237,11 +204,8 @@ function ConnectApp() {
           },
           new go.Binding("fill", "portColor")
         )
-      ) // end itemTemplate
-    }), // end Horizontal Panel
-
-    // the Panel holding the right port elements, which are themselves Panels,
-    // created for each item in the itemArray, bound to data.rightArray
+      )
+    }),
     $(go.Panel, "Vertical", new go.Binding("itemArray", "rightArray"), {
       row: 1,
       column: 2,
@@ -267,11 +231,8 @@ function ConnectApp() {
           },
           new go.Binding("fill", "portColor")
         )
-      ) // end itemTemplate
-    }), // end Vertical Panel
-
-    // the Panel holding the bottom port elements, which are themselves Panels,
-    // created for each item in the itemArray, bound to data.bottomArray
+      )
+    }),
     $(go.Panel, "Horizontal", new go.Binding("itemArray", "bottomArray"), {
       row: 2,
       column: 1,
@@ -297,22 +258,18 @@ function ConnectApp() {
           },
           new go.Binding("fill", "portColor")
         )
-      ) // end itemTemplate
-    }) // end Horizontal Panel
-  ); // end Node
+      )
+    })
+  );
 
   diagram.linkTemplate = $(
     go.Link,
-    {
-      routing: go.Link.Orthogonal,
-      fromSpot: go.Spot.Left,
-      toSpot: go.Spot.Right
-    },
-    new go.Binding("fromEndSegmentLength"),
-    new go.Binding("toEndSegmentLength"),
+    { routing: go.Link.Orthogonal, corner: 3 },
     $(go.Shape),
     $(go.Shape, { toArrow: "Standard" })
   );
+
+  diagram.toolManager.linkingTool.temporaryLink.routing = go.Link.Orthogonal;
 
   diagram.addDiagramListener("ObjectSingleClicked", function(e) {
     setSelectedNode({});
@@ -334,7 +291,12 @@ function ConnectApp() {
     setSelectedNode({});
   });
 
-  diagram.model = new go.GraphLinksModel([], []);
+  diagram.model = $(go.GraphLinksModel, {
+    linkFromPortIdProperty: "fromPort",
+    linkToPortIdProperty: "toPort",
+    nodeDataArray: [],
+    linkDataArray: []
+  });
 
   function handleModelChange(changes) {}
 
@@ -343,8 +305,7 @@ function ConnectApp() {
       ? setParamText(e.target.value)
       : setparamColor(e.target.value);
     selNode.diagramModel.commit(function(m) {
-      var data = m.nodeDataArray.find(el => el.key == selNode.diagramNode.key); // get the first link data
-      console.log(data);
+      var data = m.nodeDataArray.find(el => el.key == selNode.diagramNode.key);
       m.set(data, param, e.target.value);
     });
   }
@@ -352,23 +313,16 @@ function ConnectApp() {
   function addPort(side) {
     diagram.startTransaction("addPort");
     diagram.selection.each(function(node) {
-      // skip any selected Links
       if (!(node instanceof go.Node)) return;
-      // compute the next available index number for the side
       var i = 0;
       while (node.findPort(side + i.toString()) !== node) i++;
-      // now this new port name is unique within the whole Node because of the side prefix
       var name = side + i.toString();
-      // get the Array of port data to be modified
       var arr = node.data[side + "Array"];
       if (arr) {
-        // create a new port data object
         var newportdata = {
           portId: name,
           portColor: "black"
-          // if you add port data properties here, you should copy them in copyPortData above
         };
-        // and add it to the Array of port data
         diagram.model.insertArrayItem(arr, -1, newportdata);
       }
     });
@@ -377,7 +331,6 @@ function ConnectApp() {
 
   return (
     <div className="App">
-      ...
       <ReactPalette
         initPalette={initPalette}
         divClassName="palette-component"
@@ -394,7 +347,7 @@ function ConnectApp() {
           selectedNode.diagramNode !== undefined &&
           Object.keys(selectedNode.diagramNode).map((el, index) => {
             return (
-              <div key={selectedNode.diagramNode["key"]}>
+              <div key={selectedNode.diagramNode["key"] + index}>
                 {selectedNode.diagramNode[el] &&
                   (el === "key" || el === "text" || el === "color") && (
                     <div>
@@ -442,7 +395,6 @@ function ConnectApp() {
             );
           })}
       </div>
-      ...
     </div>
   );
 }
