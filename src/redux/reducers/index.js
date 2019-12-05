@@ -45,7 +45,7 @@ function rootReducer(state = initialState, action) {
     // });
     return {
       ...state,
-      diagramNodes: [...state.diagramNodes, action.payload]
+      diagramNodes: action.payload
     };
   }
   if (action.type === REMOVE_NODE) {
@@ -58,7 +58,7 @@ function rootReducer(state = initialState, action) {
   if (action.type === UPDATE_NODE) {
     return {
       ...state,
-      diagramNodes: action.payload
+      diagramNodes: [...state.diagramNodes, action.payload]
     };
   }
   //   if (action.type === GET_ARTICLES) {
