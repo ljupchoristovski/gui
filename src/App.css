@@ -18,8 +18,21 @@
 }
 
 .parameter-component {
-  width: 150px;
+  width: 180px;
   height: 400px;
   margin-right: 2px;
   border: solid 1px black;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto;
+}
+.grid-item {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 3px;
+  font-size: 16px;
+  text-align: left;
+  line-height: 29px;
 }

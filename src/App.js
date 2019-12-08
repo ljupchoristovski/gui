@@ -347,49 +347,62 @@ function ConnectApp() {
           selectedNode.diagramNode !== undefined &&
           Object.keys(selectedNode.diagramNode).map((el, index) => {
             return (
-              <div key={selectedNode.diagramNode["key"] + index}>
+              <div
+                className="grid-container"
+                key={selectedNode.diagramNode["key"] + index}
+              >
                 {selectedNode.diagramNode[el] &&
                   (el === "key" || el === "text" || el === "color") && (
-                    <div>
+                    <>
                       {el === "key" && (
-                        <div>
-                          {el}:{selectedNode.diagramNode[el]}
-                        </div>
+                        <>
+                          <div className="grid-item">ID:</div>
+                          <div className="grid-item">
+                            {selectedNode.diagramNode[el]}
+                          </div>
+                        </>
                       )}
                       {el === "text" && (
-                        <TextField
-                          id="standard-basic"
-                          label="Text"
-                          value={
-                            paramText !== ""
-                              ? selectedNode.diagramNode[el]
-                              : paramText
-                          }
-                          onChange={e =>
-                            changeNodeParam("text", e, selectedNode)
-                          }
-                        />
+                        <>
+                          <div className="grid-item">Name: </div>
+                          <div className="grid-item">
+                            <TextField
+                              id="standard-basic"
+                              // label="Text"
+                              value={
+                                paramText !== ""
+                                  ? selectedNode.diagramNode[el]
+                                  : paramText
+                              }
+                              onChange={e =>
+                                changeNodeParam("text", e, selectedNode)
+                              }
+                            />
+                          </div>
+                        </>
                       )}
                       {el === "color" && (
-                        <div>
-                          {el}:
-                          <FormControl className="form">
-                            <Select
-                              labelId="demo-simple-select-label"
-                              id={"demo-simple-select" + index}
-                              value={selectedNode.diagramNode[el]}
-                              onChange={e =>
-                                changeNodeParam("color", e, selectedNode)
-                              }
-                            >
-                              <MenuItem value={"red"}>{"red"}</MenuItem>
-                              <MenuItem value={"green"}>{"green"}</MenuItem>
-                              <MenuItem value={"blue"}>{"blue"}</MenuItem>
-                            </Select>
-                          </FormControl>
-                        </div>
+                        <>
+                          <div className="grid-item">{el}:</div>
+                          <div className="grid-item">
+                            <FormControl className="form">
+                              <Select
+                                labelId="demo-simple-select-label"
+                                id={"demo-simple-select" + index}
+                                value={selectedNode.diagramNode[el]}
+                                onChange={e =>
+                                  changeNodeParam("color", e, selectedNode)
+                                }
+                              >
+                                <MenuItem value={"red"}>{"red"}</MenuItem>
+                                <MenuItem value={"green"}>{"green"}</MenuItem>
+                                <MenuItem value={"blue"}>{"blue"}</MenuItem>
+                              </Select>
+                            </FormControl>
+                          </div>
+                        </>
                       )}
-                    </div>
+                    </>
                   )}
               </div>
             );
